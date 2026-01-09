@@ -1,0 +1,24 @@
+import os
+from processmanager import ProcessManager
+from dbmanager import DatabaseManager
+from jdresumeevaluation import JDResumeEvaluator
+
+ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+SOURCE_DIR = os.path.join(ROOT_DIR, "source")
+PROCESSED_DIR = os.path.join(ROOT_DIR, "processed")
+RESUME_DIR = os.path.join(ROOT_DIR, "resumes")
+
+def main():
+    if not os.path.isdir(SOURCE_DIR):
+        print(f"⚠️ Source directory not found: {SOURCE_DIR}")
+        return
+    os.makedirs(PROCESSED_DIR, exist_ok=True)
+    manager = ProcessManager(source=SOURCE_DIR, processed=PROCESSED_DIR)
+    manager.extract_jds()
+
+    db = DatabaseManager()
+    evaluator = JDResumeEvaluator(db, resume_folder=RESUME_DIR)
+    evaluator.run_full_pipeline()
+
+if __name__ == "__main__":
+    main()
